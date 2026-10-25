@@ -1,0 +1,17 @@
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px 7px 16px;
+  background: var(--acc-soft);
+  border-bottom: 1px solid var(--line);
+  color: var(--fg);
+  font-weight: 600;
+}
+.banner svg:first-child {
+  color: var(--acc);
+}
+.banner :global(.btn) {
+  margin-left: auto;
+  height: 26px;
+}

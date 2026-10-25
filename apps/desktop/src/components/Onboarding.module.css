@@ -1,0 +1,152 @@
+.modal {
+  width: min(560px, 100%);
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 20px 8px;
+}
+.hero h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.hero p {
+  margin: 3px 0 0;
+  color: var(--mut);
+}
+.mark {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+.lang {
+  margin-left: auto;
+  align-self: flex-start;
+}
+
+.steps {
+  list-style: none;
+  margin: 8px 20px 0;
+  padding: 0;
+  display: flex;
+  gap: 6px;
+}
+.steps li {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  background: var(--raise);
+  color: var(--mut);
+  font-size: 12px;
+  font-weight: 600;
+}
+.steps li span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--raise-2);
+  font-size: 11px;
+}
+.steps .current {
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px var(--acc);
+}
+.steps .current span {
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+.steps .passed span {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.body {
+  padding: 16px 20px 20px;
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.lead {
+  margin: 0;
+  color: var(--fg-2);
+  max-width: 60ch;
+}
+
+.folder,
+.check,
+.result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.folder span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.check span {
+  flex: 1;
+}
+.result {
+  border-style: dashed;
+}
+.result :global(.btn) {
+  margin-left: auto;
+}
+.ok {
+  color: var(--ok);
+}
+.bad {
+  color: var(--bad);
+}
+
+.presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.presets button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+}
+.presets button span {
+  color: var(--mut);
+  font-size: 12px;
+}
+.presets button:hover {
+  border-color: var(--line-strong);
+}
+.presets .on {
+  border-color: var(--acc);
+  background: var(--acc-soft);
+}
+.presets .on b {
+  color: var(--acc);
+}

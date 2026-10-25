@@ -10,7 +10,7 @@
   cursor: default;
 }
 .row:hover {
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--hover);
 }
 .row:focus-visible {
   box-shadow: inset 0 0 0 1.5px var(--acc);
@@ -158,7 +158,7 @@
   padding: 4px;
   border-radius: 8px;
   background: var(--raise-2);
-  box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.7);
+  box-shadow: var(--shadow);
 }
 .row:hover .actions,
 .row:focus-within .actions {
@@ -182,4 +182,7 @@
   to {
     transform: rotate(360deg);
   }
+}
+.status b.dimB {
+  color: var(--mut);
 }

@@ -8,22 +8,21 @@ use crate::model::{Format, FormatKind, JobError, MediaInfo, MediaKind, PlaylistE
 use crate::tools::{command, Tools};
 
 const YOUTUBE_HOSTS: &[&str] = &["youtube.com", "youtu.be", "youtube-nocookie.com"];
+pub const CHANNEL_TABS: &[&str] = &["videos", "shorts", "streams"];
 
 /// Accepts YouTube links (any subdomain) or a bare 11-character video id.
-/// Returns a normalized https URL.
+/// Returns a normalized https URL, or an error code for the UI.
 pub fn normalize_url(input: &str) -> Result<String, String> {
     let s = input.trim();
     if s.len() == 11 && s.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_') {
         return Ok(format!("https://www.youtube.com/watch?v={s}"));
     }
     let with_scheme = if s.starts_with("http://") || s.starts_with("https://") { s.to_string() } else { format!("https://{s}") };
-    let url = url::Url::parse(&with_scheme).map_err(|_| "Это не похоже на ссылку".to_string())?;
+    let mut url = url::Url::parse(&with_scheme).map_err(|_| "not_a_link".to_string())?;
     let host = url.host_str().unwrap_or_default().to_ascii_lowercase();
-    let ok = YOUTUBE_HOSTS.iter().any(|h| host == *h || host.ends_with(&format!(".{h}")));
-    if !ok {
-        return Err("Поддерживаются только ссылки на YouTube".into());
+    if !YOUTUBE_HOSTS.iter().any(|h| host == *h || host.ends_with(&format!(".{h}"))) {
+        return Err("not_youtube".into());
     }
-    let mut url = url;
     let _ = url.set_scheme("https");
     Ok(url.to_string())
 }
@@ -39,24 +38,49 @@ pub fn is_single_video(url: &str) -> bool {
         || u.query_pairs().any(|(k, _)| k == "v")
 }
 
-pub async fn probe(tools: &Tools, proxy: &str, url: &str) -> Result<MediaInfo, JobError> {
+/// For channel links returns the channel root path (e.g. "/@name") and the tab in the link.
+pub fn channel_parts(url: &str) -> Option<(String, Option<String>)> {
+    let u = url::Url::parse(url).ok()?;
+    let segs: Vec<&str> = u.path_segments()?.filter(|s| !s.is_empty()).collect();
+    let (base, rest) = match segs.as_slice() {
+        [first, rest @ ..] if first.starts_with('@') => (format!("/{first}"), rest),
+        [kind, id, rest @ ..] if ["channel", "c", "user"].contains(kind) => (format!("/{kind}/{id}"), rest),
+        _ => return None,
+    };
+    Some((base, rest.first().map(|t| t.to_string())))
+}
+
+pub fn channel_tab_url(base: &str, tab: &str) -> String {
+    format!("https://www.youtube.com{base}/{tab}")
+}
+
+pub async fn probe(tools: &Tools, base_args: &[String], url: &str) -> Result<MediaInfo, JobError> {
+    // Channel roots list their tabs, not videos: open the requested tab (default "videos").
+    let (url, tab) = match channel_parts(url) {
+        Some((base, tab)) => {
+            let tab = tab.filter(|t| CHANNEL_TABS.contains(&t.as_str())).unwrap_or_else(|| "videos".into());
+            (channel_tab_url(&base, &tab), Some(tab))
+        }
+        None => (url.to_string(), None),
+    };
     let mut cmd = command(&tools.ytdlp);
-    cmd.args(tools.base_args(proxy));
+    cmd.args(base_args);
     cmd.args(["-J", "--flat-playlist", "--no-warnings"]);
-    if is_single_video(url) {
+    if is_single_video(&url) {
         cmd.arg("--no-playlist");
     }
-    cmd.arg("--").arg(url);
-    let out = tokio::time::timeout(Duration::from_secs(90), cmd.output())
+    cmd.arg("--").arg(&url);
+    let out = tokio::time::timeout(Duration::from_secs(180), cmd.output())
         .await
-        .map_err(|_| JobError { code: "timeout".into(), detail: "yt-dlp не ответил за 90 секунд".into() })?
+        .map_err(|_| JobError { code: "timeout".into(), detail: "yt-dlp: 180 s".into() })?
         .map_err(|e| JobError { code: "tool_missing".into(), detail: e.to_string() })?;
     if !out.status.success() {
         return Err(classify_error(&String::from_utf8_lossy(&out.stderr)));
     }
-    let json: Value = serde_json::from_slice(&out.stdout)
-        .map_err(|e| JobError { code: "unknown".into(), detail: format!("Не удалось разобрать ответ yt-dlp: {e}") })?;
-    Ok(parse_media(&json, url))
+    let json: Value = serde_json::from_slice(&out.stdout).map_err(|e| JobError { code: "unknown".into(), detail: e.to_string() })?;
+    let mut media = parse_media(&json, &url);
+    media.channel_tab = tab;
+    Ok(media)
 }
 
 fn s(v: &Value, key: &str) -> Option<String> {
@@ -76,12 +100,17 @@ pub fn parse_media(j: &Value, url: &str) -> MediaInfo {
             .and_then(Value::as_array)
             .map(|a| {
                 a.iter()
-                    .filter_map(|e| {
+                    .enumerate()
+                    .filter_map(|(i, e)| {
                         let id = s(e, "id")?;
                         Some(PlaylistEntry {
+                            index: i as u32 + 1,
                             title: s(e, "title").unwrap_or_else(|| id.clone()),
                             duration: f(e, "duration"),
                             url: s(e, "url").unwrap_or_else(|| format!("https://www.youtube.com/watch?v={id}")),
+                            view_count: u(e, "view_count"),
+                            downloaded: false,
+                            formats: None,
                             id,
                         })
                     })
@@ -92,11 +121,7 @@ pub fn parse_media(j: &Value, url: &str) -> MediaInfo {
         Vec::new()
     };
 
-    let formats = j
-        .get("formats")
-        .and_then(Value::as_array)
-        .map(|a| a.iter().filter_map(parse_format).collect())
-        .unwrap_or_default();
+    let formats = j.get("formats").and_then(Value::as_array).map(|a| a.iter().filter_map(parse_format).collect()).unwrap_or_default();
 
     let mut subtitles = Vec::new();
     for (key, auto) in [("subtitles", false), ("automatic_captions", true)] {
@@ -109,27 +134,19 @@ pub fn parse_media(j: &Value, url: &str) -> MediaInfo {
                 if auto && !(code.ends_with("-orig") || ["ru", "en", "uk", "de", "fr", "es"].contains(&code.as_str())) {
                     continue;
                 }
-                let name = tracks
-                    .as_array()
-                    .and_then(|t| t.first())
-                    .and_then(|t| s(t, "name"))
-                    .unwrap_or_else(|| code.clone());
+                let name = tracks.as_array().and_then(|t| t.first()).and_then(|t| s(t, "name")).unwrap_or_else(|| code.clone());
                 subtitles.push(SubtitleTrack { code: code.clone(), name, auto });
             }
         }
     }
 
-    let thumbnail = s(j, "thumbnail").or_else(|| {
-        j.get("thumbnails")
-            .and_then(Value::as_array)
-            .and_then(|t| t.iter().rev().find_map(|x| s(x, "url")))
-    });
+    let thumbnail = s(j, "thumbnail").or_else(|| j.get("thumbnails").and_then(Value::as_array).and_then(|t| t.iter().rev().find_map(|x| s(x, "url"))));
 
     MediaInfo {
         kind: if is_playlist { MediaKind::Playlist } else { MediaKind::Video },
         id: s(j, "id").unwrap_or_default(),
         url: s(j, "webpage_url").unwrap_or_else(|| url.to_string()),
-        title: s(j, "title").unwrap_or_else(|| "Без названия".into()),
+        title: s(j, "title").unwrap_or_default(),
         channel: s(j, "channel").or_else(|| s(j, "uploader")),
         duration: f(j, "duration"),
         thumbnail,
@@ -139,10 +156,23 @@ pub fn parse_media(j: &Value, url: &str) -> MediaInfo {
         subtitles,
         chapters: j.get("chapters").and_then(Value::as_array).map(|c| c.len() as u32).unwrap_or(0),
         entries,
+        channel_tab: None,
     }
 }
 
-fn parse_format(v: &Value) -> Option<Format> {
+/// Format fields the playlist size scan asks yt-dlp for (keeps its output small).
+pub const SCAN_FIELDS: &str =
+    "format_id,ext,protocol,vcodec,acodec,width,height,fps,dynamic_range,tbr,abr,filesize,filesize_approx,language,language_preference,format_note";
+
+/// Parses one line of the size scan: `<video id>|<formats JSON array>`.
+pub fn parse_scan_line(line: &str) -> Option<(String, Vec<Format>)> {
+    let (id, json) = line.split_once('|')?;
+    let arr: Value = serde_json::from_str(json).ok()?;
+    let formats = arr.as_array()?.iter().filter_map(parse_format).collect();
+    Some((id.to_string(), formats))
+}
+
+pub fn parse_format(v: &Value) -> Option<Format> {
     let protocol = s(v, "protocol").unwrap_or_default();
     // HLS/DASH manifests duplicate the plain https streams and storyboards are images.
     if protocol.contains("m3u8") || protocol == "mhtml" || protocol.contains("dash") {
@@ -191,12 +221,14 @@ pub fn classify_error(stderr: &str) -> JobError {
         .rev()
         .find(|l| l.starts_with("ERROR:"))
         .or_else(|| stderr.lines().rev().find(|l| !l.trim().is_empty()))
-        .unwrap_or("yt-dlp завершился с ошибкой")
+        .unwrap_or("yt-dlp")
         .trim_start_matches("ERROR:")
         .trim()
         .to_string();
     let l = detail.to_lowercase();
-    let code = if l.contains("confirm you’re not a bot") || l.contains("confirm you're not a bot") || l.contains("sign in to confirm") {
+    let code = if l.contains("does not have a") && l.contains("tab") {
+        "tab_empty"
+    } else if l.contains("confirm you’re not a bot") || l.contains("confirm you're not a bot") || l.contains("sign in to confirm") {
         "bot_check"
     } else if l.contains("age") && (l.contains("restrict") || l.contains("inappropriate") || l.contains("confirm your age")) {
         "age_restricted"
@@ -218,6 +250,8 @@ pub fn classify_error(stderr: &str) -> JobError {
         "ffmpeg"
     } else if l.contains("no space left") {
         "disk_full"
+    } else if l.contains("cookies") {
+        "cookies"
     } else {
         "unknown"
     };
@@ -233,7 +267,7 @@ mod tests {
         assert_eq!(normalize_url("jNQXAC9IVRw").unwrap(), "https://www.youtube.com/watch?v=jNQXAC9IVRw");
         assert!(normalize_url("youtu.be/jNQXAC9IVRw").unwrap().starts_with("https://youtu.be/"));
         assert!(normalize_url("https://music.youtube.com/watch?v=abc").is_ok());
-        assert!(normalize_url("https://evil-youtube.com/watch?v=abc").is_err());
+        assert_eq!(normalize_url("https://evil-youtube.com/watch?v=abc").unwrap_err(), "not_youtube");
         assert!(normalize_url("https://example.com/youtube.com").is_err());
     }
 
@@ -247,9 +281,19 @@ mod tests {
     }
 
     #[test]
+    fn detects_channels() {
+        assert_eq!(channel_parts("https://www.youtube.com/@name").unwrap(), ("/@name".into(), None));
+        assert_eq!(channel_parts("https://www.youtube.com/@name/shorts").unwrap(), ("/@name".into(), Some("shorts".into())));
+        assert_eq!(channel_parts("https://www.youtube.com/channel/UC123/videos").unwrap().0, "/channel/UC123");
+        assert!(channel_parts("https://www.youtube.com/watch?v=x").is_none());
+        assert!(channel_parts("https://www.youtube.com/playlist?list=PL1").is_none());
+    }
+
+    #[test]
     fn classifies_errors() {
         assert_eq!(classify_error("ERROR: [youtube] x: Private video. Sign in").code, "private");
         assert_eq!(classify_error("ERROR: [youtube] x: Sign in to confirm you're not a bot").code, "bot_check");
         assert_eq!(classify_error("ERROR: unable to download video data: HTTP Error 403: Forbidden").code, "forbidden");
+        assert_eq!(classify_error("ERROR: [youtube:tab] @name: This channel does not have a shorts tab").code, "tab_empty");
     }
 }

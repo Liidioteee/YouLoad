@@ -47,10 +47,19 @@ pub struct SubtitleTrack {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlaylistEntry {
+    /// 1-based position, as yt-dlp's --playlist-items expects.
+    pub index: u32,
     pub id: String,
     pub title: String,
     pub duration: Option<f64>,
     pub url: String,
+    pub view_count: Option<u64>,
+    /// Already downloaded by YouLoad before (from history).
+    #[serde(default)]
+    pub downloaded: bool,
+    /// Formats fetched in the background to estimate the playlist size; None until then.
+    #[serde(default)]
+    pub formats: Option<Vec<Format>>,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -76,6 +85,9 @@ pub struct MediaInfo {
     pub subtitles: Vec<SubtitleTrack>,
     pub chapters: u32,
     pub entries: Vec<PlaylistEntry>,
+    /// For channel links: "videos" | "shorts" | "streams".
+    #[serde(default)]
+    pub channel_tab: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
@@ -109,6 +121,15 @@ pub struct DownloadOptions {
     pub embed_thumbnail: bool,
     pub embed_metadata: bool,
     pub embed_chapters: bool,
+    /// Playlist positions to download; None = all.
+    pub playlist_items: Option<Vec<u32>>,
+    /// Download only this time range, seconds.
+    pub section_start: Option<f64>,
+    pub section_end: Option<f64>,
+    /// The user picked exact formats in the formats table (UI-only hint).
+    pub manual_formats: bool,
+    /// Preset the choices came from (UI-only hint).
+    pub preset: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -119,6 +140,7 @@ pub enum JobStatus {
     Queued,
     Downloading,
     Processing,
+    Paused,
     Done,
     Error,
     Canceled,
@@ -143,7 +165,7 @@ pub struct Progress {
     pub eta: Option<f64>,
     /// "download" | "merging" | "converting" | "finishing"
     pub stage: Option<String>,
-    /// playlist position, 1-based
+    /// position among the selected playlist items, 1-based
     pub item: Option<u32>,
     pub items: Option<u32>,
 }
@@ -169,4 +191,42 @@ pub struct Job {
     pub progress: Progress,
     pub error: Option<JobError>,
     pub outputs: Vec<String>,
+    /// YouTube ids of the videos finished by this job.
+    #[serde(default)]
+    pub done_ids: Vec<String>,
+    #[serde(default)]
+    pub finished_at: Option<u64>,
+    /// Total size of the output files.
+    #[serde(default)]
+    pub size: Option<u64>,
+}
+
+/// A finished download, kept for the "Готово" section after it leaves the queue.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HistoryItem {
+    pub id: String,
+    pub url: String,
+    pub kind: MediaKind,
+    pub video_id: String,
+    pub title: String,
+    pub channel: Option<String>,
+    pub duration: Option<f64>,
+    pub finished_at: u64,
+    pub outputs: Vec<String>,
+    pub size: Option<u64>,
+    pub options: Option<DownloadOptions>,
+    /// Videos downloaded, for playlists.
+    pub count: u32,
+    /// First video id, for the thumbnail.
+    pub thumb_id: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LogLine {
+    pub ts: u64,
+    pub level: &'static str,
+    pub source: String,
+    pub text: String,
 }

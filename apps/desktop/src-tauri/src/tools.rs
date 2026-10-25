@@ -47,8 +47,8 @@ impl Tools {
     }
 
     /// Arguments every yt-dlp call gets: our ffmpeg and Deno, no user config files,
-    /// UTF-8 output, optional proxy.
-    pub fn base_args(&self, proxy: &str) -> Vec<String> {
+    /// UTF-8 output, optional proxy and cookies.
+    pub fn base_args(&self, proxy: &str, cookies: Option<&Path>) -> Vec<String> {
         let mut args = vec![
             "--no-config".into(),
             "--encoding".into(),
@@ -61,6 +61,10 @@ impl Tools {
         if !proxy.is_empty() {
             args.push("--proxy".into());
             args.push(proxy.into());
+        }
+        if let Some(c) = cookies {
+            args.push("--cookies".into());
+            args.push(c.to_string_lossy().into_owned());
         }
         args
     }

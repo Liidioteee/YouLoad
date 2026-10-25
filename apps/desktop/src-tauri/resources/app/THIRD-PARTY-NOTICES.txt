@@ -2,10 +2,14 @@ YouLoad bundles the following third-party software. Each component is
 distributed unmodified, as a separate program, under its own license.
 
 yt-dlp            https://github.com/yt-dlp/yt-dlp            The Unlicense
-FFmpeg            https://ffmpeg.org  (BtbN LGPL build)        LGPL-2.1-or-later, see tools/ffmpeg/LICENSE.txt
+FFmpeg            https://ffmpeg.org
+                  Windows, Linux: BtbN LGPL build, LGPL-2.1-or-later (tools/ffmpeg/LICENSE.txt)
                   Source: https://github.com/BtbN/FFmpeg-Builds
+                  macOS: Martin Riedl static build, GPL-3.0-or-later
+                  Source: https://git.martin-riedl.de/ffmpeg/build-script
 Deno              https://github.com/denoland/deno            MIT License
-zapret (winws)    https://github.com/bol-van/zapret           MIT License, Copyright (c) 2016-2026 bol-van
+zapret (winws,    https://github.com/bol-van/zapret           MIT License, Copyright (c) 2016-2026 bol-van
+  tpws)
 zapret strategies https://github.com/Flowseal/zapret-discord-youtube
                                                               MIT License, Copyright (c) 2024-2026 Flowseal
 WinDivert         https://github.com/basil00/WinDivert        LGPL-3.0 or GPL-2.0 (at your choice)

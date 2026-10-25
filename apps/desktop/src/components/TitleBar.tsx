@@ -2,11 +2,13 @@ import { useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ArrowDown, Copy, Minus, Square, X } from "lucide-react";
 
+import { useT } from "../lib/i18n";
 import { useStore } from "../store";
 import { BypassPill } from "./BypassPill";
 import styles from "./TitleBar.module.css";
 
 export function TitleBar() {
+  const t = useT();
   const addUrls = useStore((s) => s.addUrls);
   const [value, setValue] = useState("");
   const [maximized, setMaximized] = useState(false);
@@ -45,13 +47,13 @@ export function TitleBar() {
           className={styles.input}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="Вставьте ссылку на видео, плейлист или канал"
+          placeholder={t("titlebar.placeholder")}
           spellCheck={false}
           autoComplete="off"
         />
         {value ? (
           <button type="submit" className={`btn primary ${styles.go}`}>
-            Добавить
+            {t("titlebar.add")}
           </button>
         ) : (
           <kbd className={styles.kbd}>Ctrl+V</kbd>
@@ -61,13 +63,13 @@ export function TitleBar() {
       <BypassPill />
 
       <div className={styles.controls}>
-        <button className={styles.ctl} onClick={() => win.minimize()} aria-label="Свернуть">
+        <button className={styles.ctl} onClick={() => win.minimize()} aria-label={t("titlebar.minimize")}>
           <Minus size={15} />
         </button>
-        <button className={styles.ctl} onClick={toggleMax} aria-label={maximized ? "Восстановить" : "Развернуть"}>
+        <button className={styles.ctl} onClick={toggleMax} aria-label={maximized ? t("titlebar.restore") : t("titlebar.maximize")}>
           {maximized ? <Copy size={12} /> : <Square size={12} />}
         </button>
-        <button className={`${styles.ctl} ${styles.close}`} onClick={() => win.close()} aria-label="Закрыть">
+        <button className={`${styles.ctl} ${styles.close}`} onClick={() => win.close()} aria-label={t("titlebar.close")}>
           <X size={16} />
         </button>
       </div>

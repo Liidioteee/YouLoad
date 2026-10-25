@@ -12,7 +12,7 @@
   top: 10px;
   right: 10px;
   z-index: 2;
-  background: rgba(22, 23, 27, 0.7);
+  background: var(--glass);
   backdrop-filter: blur(6px);
 }
 
@@ -63,9 +63,6 @@
   gap: 8px;
   color: var(--mut);
 }
-.loading svg {
-  animation: spin 0.9s linear infinite;
-}
 
 .error {
   display: flex;
@@ -73,7 +70,7 @@
   padding: 12px;
   border-radius: var(--r);
   background: var(--bad-soft);
-  border: 1px solid rgba(240, 106, 106, 0.3);
+  border: 1px solid var(--bad);
 }
 .error > svg {
   flex: none;
@@ -82,7 +79,7 @@
 }
 .error b {
   display: block;
-  color: #ffd6d6;
+  color: var(--bad-text);
 }
 .error p {
   margin: 4px 0 6px;
@@ -123,40 +120,38 @@
   opacity: 0.55;
 }
 
-.segmented {
-  display: flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: 8px;
-  background: var(--bg);
-}
-.segmented button {
-  flex: 1;
-  height: 28px;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--mut);
-  font-weight: 600;
-}
-.segmented button:hover:not(:disabled) {
-  color: var(--fg);
-}
-.segmented .segOn {
-  background: var(--raise-2);
-  color: var(--fg);
-}
-
 .group {
   display: flex;
   flex-direction: column;
   gap: 7px;
   min-width: 0;
 }
+.groupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 18px;
+}
 
 .hint {
   color: var(--mut);
   font-size: 11.5px;
+}
+.hintBad {
+  color: var(--bad);
+  font-size: 11.5px;
+}
+
+.tiny {
+  width: 22px;
+  height: 22px;
+}
+.linkBtn {
+  height: 22px;
+  padding: 0 6px;
+  font-size: 11.5px;
+  color: var(--acc);
 }
 
 .chips {
@@ -191,21 +186,80 @@
   background: var(--acc-soft);
 }
 
-.select {
+/* Presets: two columns of small cards */
+.presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+.preset {
+  position: relative;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  min-width: 0;
+}
+.preset > button:first-child {
   width: 100%;
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--mut) 50%), linear-gradient(135deg, var(--mut) 50%, transparent 50%);
-  background-position: calc(100% - 15px) 15px, calc(100% - 10px) 15px;
-  background-size: 5px 5px;
-  background-repeat: no-repeat;
-  padding-right: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 6px 9px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  border-radius: var(--r-sm);
 }
-.select option {
-  background: var(--panel);
+.preset b {
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
-
-.static {
-  color: var(--fg-2);
+.preset span {
+  font-size: 11px;
+  color: var(--mut);
+  white-space: nowrap;
+}
+.preset:hover {
+  border-color: var(--line-strong);
+}
+.preset.on {
+  border-color: var(--acc);
+  background: var(--acc-soft);
+}
+.preset.on b {
+  color: var(--acc);
+}
+.presetDelete {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  display: none;
+  place-items: center;
+  border: none;
+  border-radius: 4px;
+  background: var(--raise-2);
+  color: var(--mut);
+}
+.preset:hover .presetDelete {
+  display: grid;
+}
+.presetDelete:hover {
+  color: var(--bad);
+}
+.presetForm {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.presetForm :global(.field) {
+  flex: 1;
+  height: 30px;
 }
 
 .suggest {
@@ -215,7 +269,7 @@
   margin-top: -8px;
   padding: 7px 10px;
   border-radius: var(--r-sm);
-  border: 1px dashed rgba(242, 169, 59, 0.45);
+  border: 1px dashed var(--acc);
   background: transparent;
   color: var(--acc);
   font-size: 12px;
@@ -224,6 +278,10 @@
 }
 .suggest:hover {
   background: var(--acc-soft);
+}
+
+.static {
+  color: var(--fg-2);
 }
 
 .check {
@@ -237,6 +295,120 @@
   width: 14px;
   height: 14px;
   margin: 0;
+  flex: none;
+}
+
+/* Playlist picker */
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 8px;
+  background: var(--bg);
+}
+.pickerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--fg-2);
+}
+.pickerActions {
+  display: flex;
+}
+.pickerActions :global(.btn) {
+  height: 24px;
+  padding: 0 7px;
+  font-size: 11.5px;
+}
+.pickerSearch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  color: var(--mut);
+}
+.pickerSearch input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  user-select: text;
+}
+.entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.entry {
+  display: grid;
+  grid-template-columns: 16px 30px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  content-visibility: auto;
+  contain-intrinsic-size: 26px;
+}
+.entry:hover {
+  background: var(--hover);
+}
+.entry input {
+  accent-color: var(--acc);
+  margin: 0;
+}
+.entryIndex,
+.entryDur {
+  color: var(--mut);
+  font-size: 11px;
+}
+.entryTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.entryDone .entryTitle {
+  color: var(--mut);
+}
+.entryBadge {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+/* Fragment */
+.fragment {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fragmentRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.fragmentRow label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11.5px;
+  color: var(--mut);
+}
+.fragmentRow :global(.field) {
+  height: 30px;
 }
 
 .footer {
@@ -258,14 +430,10 @@
   color: var(--fg);
   font-size: 14px;
 }
-.footer :global(.btn) {
+.footerButtons {
   margin-left: auto;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  display: flex;
+  gap: 6px;
 }
 
 /* Narrow window: the panel slides over the list. */
@@ -277,6 +445,6 @@
     bottom: 0;
     width: min(var(--inspector), 100%);
     z-index: 10;
-    box-shadow: -24px 0 40px -20px rgba(0, 0, 0, 0.7);
+    box-shadow: var(--shadow);
   }
 }

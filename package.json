@@ -1,15 +1,20 @@
 {
   "name": "youload",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "YouTube downloader with built-in DPI bypass",
   "license": "MIT",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "fetch-tools": "node scripts/fetch-tools.mjs",
     "dev": "npm run tauri -w apps/desktop -- dev",
     "build": "npm run tauri -w apps/desktop -- build",
     "typecheck": "npm run typecheck -w apps/desktop"
   },
-  "engines": { "node": ">=22" }
+  "engines": {
+    "node": ">=22"
+  }
 }

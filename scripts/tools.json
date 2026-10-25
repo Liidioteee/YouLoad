@@ -1,5 +1,5 @@
 {
-  "$comment": "Pinned third-party tools bundled with YouLoad. sha256 is filled in by `npm run fetch-tools -- --lock` after checking upstream checksums.",
+  "$comment": "Pinned third-party tools bundled with YouLoad, per target. Verified against pinned sha256, the upstream checksum file, or upstream hashes of files inside the archive (see scripts/fetch-tools.mjs).",
   "windows-x64": {
     "yt-dlp": {
       "version": "2026.10.21",
@@ -46,6 +46,159 @@
         "*/general*.bat": "zapret/strategies-src/"
       },
       "sha256": "291af673bd0238506f9548e0e94ca0abf244000f4c9a06960544fb01c5f97b34"
+    }
+  },
+  "linux-x64": {
+    "yt-dlp": {
+      "version": "2026.10.21",
+      "url": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/yt-dlp_linux",
+      "checksums": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/SHA2-256SUMS",
+      "checksumName": "yt-dlp_linux",
+      "kind": "file",
+      "dest": "yt-dlp",
+      "sha256": ""
+    },
+    "deno": {
+      "version": "2.9.8",
+      "url": "https://github.com/denoland/deno/releases/download/v2.9.8/deno-x86_64-unknown-linux-gnu.zip",
+      "checksums": "https://github.com/denoland/deno/releases/download/v2.9.8/deno-x86_64-unknown-linux-gnu.zip.sha256sum",
+      "checksumName": "deno-x86_64-unknown-linux-gnu.zip",
+      "kind": "zip",
+      "extract": {
+        "deno": "deno"
+      },
+      "sha256": ""
+    },
+    "ffmpeg": {
+      "version": "n9.0.2-35-g9a9b70bb8c",
+      "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-24-13-02/ffmpeg-n9.0.2-35-g9a9b70bb8c-linux64-lgpl-9.0.tar.xz",
+      "checksums": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-24-13-02/checksums.sha256",
+      "checksumName": "ffmpeg-n9.0.2-35-g9a9b70bb8c-linux64-lgpl-9.0.tar.xz",
+      "kind": "tar",
+      "extract": {
+        "*/bin/ffmpeg": "ffmpeg/ffmpeg",
+        "*/bin/ffprobe": "ffmpeg/ffprobe",
+        "*/LICENSE.txt": "ffmpeg/LICENSE.txt"
+      },
+      "sha256": ""
+    },
+    "zapret": {
+      "version": "bol-van-v72.13",
+      "url": "https://github.com/bol-van/zapret/releases/download/v72.13/zapret-v72.13.zip",
+      "innerChecksums": "https://github.com/bol-van/zapret/releases/download/v72.13/sha256sum.txt",
+      "kind": "zip",
+      "extract": {
+        "*/binaries/linux-x86_64/tpws": "zapret/tpws"
+      },
+      "sha256": ""
+    }
+  },
+  "macos-arm64": {
+    "yt-dlp": {
+      "version": "2026.10.21",
+      "url": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/yt-dlp_macos",
+      "checksums": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/SHA2-256SUMS",
+      "checksumName": "yt-dlp_macos",
+      "kind": "file",
+      "dest": "yt-dlp",
+      "sha256": ""
+    },
+    "deno": {
+      "version": "2.9.8",
+      "url": "https://github.com/denoland/deno/releases/download/v2.9.8/deno-aarch64-apple-darwin.zip",
+      "checksums": "https://github.com/denoland/deno/releases/download/v2.9.8/deno-aarch64-apple-darwin.zip.sha256sum",
+      "checksumName": "deno-aarch64-apple-darwin.zip",
+      "kind": "zip",
+      "extract": {
+        "deno": "deno"
+      },
+      "sha256": ""
+    },
+    "ffmpeg": {
+      "version": "9.0.2 (martin-riedl)",
+      "url": "https://ffmpeg.martin-riedl.de/download/macos/arm64/1789931890_9.0.2/ffmpeg.zip",
+      "checksums": "https://ffmpeg.martin-riedl.de/download/macos/arm64/1789931890_9.0.2/ffmpeg.zip.sha256",
+      "checksumName": "ffmpeg.zip",
+      "kind": "zip",
+      "extract": {
+        "ffmpeg": "ffmpeg/ffmpeg"
+      },
+      "sha256": ""
+    },
+    "ffprobe": {
+      "version": "9.0.2 (martin-riedl)",
+      "url": "https://ffmpeg.martin-riedl.de/download/macos/arm64/1789931890_9.0.2/ffprobe.zip",
+      "checksums": "https://ffmpeg.martin-riedl.de/download/macos/arm64/1789931890_9.0.2/ffprobe.zip.sha256",
+      "checksumName": "ffprobe.zip",
+      "kind": "zip",
+      "extract": {
+        "ffprobe": "ffmpeg/ffprobe"
+      },
+      "sha256": ""
+    },
+    "zapret": {
+      "version": "bol-van-v72.13",
+      "url": "https://github.com/bol-van/zapret/releases/download/v72.13/zapret-v72.13.zip",
+      "innerChecksums": "https://github.com/bol-van/zapret/releases/download/v72.13/sha256sum.txt",
+      "kind": "zip",
+      "extract": {
+        "*/binaries/mac64/tpws": "zapret/tpws"
+      },
+      "sha256": ""
+    }
+  },
+  "macos-x64": {
+    "yt-dlp": {
+      "version": "2026.10.21",
+      "url": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/yt-dlp_macos",
+      "checksums": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/SHA2-256SUMS",
+      "checksumName": "yt-dlp_macos",
+      "kind": "file",
+      "dest": "yt-dlp",
+      "sha256": ""
+    },
+    "deno": {
+      "version": "2.9.8",
+      "url": "https://github.com/denoland/deno/releases/download/v2.9.8/deno-x86_64-apple-darwin.zip",
+      "checksums": "https://github.com/denoland/deno/releases/download/v2.9.8/deno-x86_64-apple-darwin.zip.sha256sum",
+      "checksumName": "deno-x86_64-apple-darwin.zip",
+      "kind": "zip",
+      "extract": {
+        "deno": "deno"
+      },
+      "sha256": ""
+    },
+    "ffmpeg": {
+      "version": "9.0.2 (martin-riedl)",
+      "url": "https://ffmpeg.martin-riedl.de/download/macos/amd64/1789931006_9.0.2/ffmpeg.zip",
+      "checksums": "https://ffmpeg.martin-riedl.de/download/macos/amd64/1789931006_9.0.2/ffmpeg.zip.sha256",
+      "checksumName": "ffmpeg.zip",
+      "kind": "zip",
+      "extract": {
+        "ffmpeg": "ffmpeg/ffmpeg"
+      },
+      "sha256": ""
+    },
+    "ffprobe": {
+      "version": "9.0.2 (martin-riedl)",
+      "url": "https://ffmpeg.martin-riedl.de/download/macos/amd64/1789931006_9.0.2/ffprobe.zip",
+      "checksums": "https://ffmpeg.martin-riedl.de/download/macos/amd64/1789931006_9.0.2/ffprobe.zip.sha256",
+      "checksumName": "ffprobe.zip",
+      "kind": "zip",
+      "extract": {
+        "ffprobe": "ffmpeg/ffprobe"
+      },
+      "sha256": ""
+    },
+    "zapret": {
+      "version": "bol-van-v72.13",
+      "url": "https://github.com/bol-van/zapret/releases/download/v72.13/zapret-v72.13.zip",
+      "innerChecksums": "https://github.com/bol-van/zapret/releases/download/v72.13/sha256sum.txt",
+      "kind": "zip",
+      "extract": {
+        "*/binaries/mac64/tpws": "zapret/tpws"
+      },
+      "sha256": ""
     }
   }
 }

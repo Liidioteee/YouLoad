@@ -1,20 +1,20 @@
-// Human-readable numbers in Russian conventions (decimal comma, short units).
+// Human-readable numbers in the UI language (decimal comma in Russian, short units).
 
-const num1 = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
-const num2 = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 });
-const int = new Intl.NumberFormat("ru-RU");
+import type { T } from "./i18n";
 
-export function bytes(n: number | null | undefined): string {
+const nf = (lang: string, digits: number) => new Intl.NumberFormat(lang === "ru" ? "ru-RU" : "en-US", { maximumFractionDigits: digits });
+
+export function bytes(n: number | null | undefined, t: T): string {
   if (n == null || !Number.isFinite(n)) return "—";
-  if (n < 1024) return `${n} Б`;
-  if (n < 1024 ** 2) return `${num1.format(n / 1024)} КБ`;
-  if (n < 1024 ** 3) return `${num1.format(n / 1024 ** 2)} МБ`;
-  return `${num2.format(n / 1024 ** 3)} ГБ`;
+  if (n < 1024) return `${Math.round(n)} ${t("units.b")}`;
+  if (n < 1024 ** 2) return `${nf(t.lang, 1).format(n / 1024)} ${t("units.kb")}`;
+  if (n < 1024 ** 3) return `${nf(t.lang, 1).format(n / 1024 ** 2)} ${t("units.mb")}`;
+  return `${nf(t.lang, 2).format(n / 1024 ** 3)} ${t("units.gb")}`;
 }
 
-export function speed(bps: number | null | undefined): string {
+export function speed(bps: number | null | undefined, t: T): string {
   if (bps == null || !Number.isFinite(bps) || bps <= 0) return "";
-  return `${bytes(bps)}/с`;
+  return `${bytes(bps, t)}${t("units.perSec")}`;
 }
 
 export function clock(seconds: number | null | undefined): string {
@@ -26,24 +26,32 @@ export function clock(seconds: number | null | undefined): string {
   return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${sec}` : `${m}:${sec}`;
 }
 
+/** "1:20", "01:02:30", "95" → seconds; null when it does not parse. */
+export function parseClock(text: string): number | null {
+  const parts = text.trim().split(":").map((p) => p.trim());
+  if (!parts.length || parts.some((p) => !/^\d+(\.\d+)?$/.test(p))) return null;
+  return parts.reduce((acc, p) => acc * 60 + Number(p), 0);
+}
+
 export function percent(fraction: number | null | undefined): string {
   if (fraction == null) return "";
   return `${Math.floor(Math.min(1, Math.max(0, fraction)) * 100)}%`;
 }
 
-export function views(n: number | null | undefined): string {
-  if (n == null) return "";
-  if (n >= 1e9) return `${num1.format(n / 1e9)} млрд просмотров`;
-  if (n >= 1e6) return `${num1.format(n / 1e6)} млн просмотров`;
-  if (n >= 1e3) return `${num1.format(n / 1e3)} тыс. просмотров`;
-  return `${int.format(n)} просмотров`;
+export function compact(n: number, t: T): string {
+  const f = nf(t.lang, 1);
+  if (n >= 1e9) return t("units.billion", { n: f.format(n / 1e9) });
+  if (n >= 1e6) return t("units.million", { n: f.format(n / 1e6) });
+  if (n >= 1e4) return t("units.thousand", { n: f.format(n / 1e3) });
+  return nf(t.lang, 0).format(n);
 }
 
-/** "5 видео", "21 видео" — the word does not change, but keep one place for plurals. */
-export function plural(n: number, one: string, few: string, many: string): string {
-  const m10 = n % 10;
-  const m100 = n % 100;
-  if (m10 === 1 && m100 !== 11) return one;
-  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
-  return many;
+export function views(n: number | null | undefined, t: T): string {
+  if (n == null) return "";
+  // Plural rules see the raw number for small counts; "1,2 млн" falls into the "many" form.
+  return t("units.views", { n: n < 1e4 ? n : compact(n, t) });
+}
+
+export function date(ms: number, t: T): string {
+  return new Intl.DateTimeFormat(t.lang === "ru" ? "ru-RU" : "en-US", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(ms));
 }

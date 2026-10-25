@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 860px;
+  max-width: 880px;
 }
 
 .head h1 {
@@ -47,14 +47,14 @@
   color: var(--mut);
 }
 .ok {
-  border-color: rgba(79, 194, 138, 0.35);
+  border-color: var(--ok);
 }
 .ok .statusIcon {
   background: var(--ok-soft);
   color: var(--ok);
 }
 .bad {
-  border-color: rgba(240, 106, 106, 0.4);
+  border-color: var(--bad);
 }
 .bad .statusIcon {
   background: var(--bad-soft);
@@ -107,70 +107,42 @@
   align-items: center;
   gap: 8px;
   padding: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
-.card > .buttons {
-  padding: 0 16px 14px;
+.cardButtons {
+  justify-content: flex-start;
+  padding: 4px 16px 14px;
 }
 
 .selectField {
   width: 200px;
 }
-.proxyField {
+.textField {
   width: 240px;
   font-size: 12px;
 }
 
-.seg {
+.progressRow {
   display: flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: 8px;
-  background: var(--bg);
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 12px;
+  color: var(--fg-2);
 }
-.seg button {
-  width: 32px;
-  height: 26px;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--mut);
-  font-weight: 600;
-}
-.seg .segOn {
-  background: var(--acc);
-  color: var(--acc-ink);
-}
-
-/* Native checkbox restyled as a switch. */
-.switch {
-  appearance: none;
-  flex: none;
-  width: 36px;
-  height: 20px;
-  border-radius: 10px;
+.progress {
+  flex: 1;
+  max-width: 220px;
+  height: 4px;
+  border-radius: 2px;
   background: var(--raise-2);
-  position: relative;
-  margin: 0;
-  cursor: pointer;
-  transition: background 0.15s;
+  overflow: hidden;
 }
-.switch::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--mut);
-  transition: left 0.15s, background 0.15s;
-}
-.switch:checked {
+.progress i {
+  display: block;
+  height: 100%;
   background: var(--acc);
-}
-.switch:checked::after {
-  left: 19px;
-  background: var(--acc-ink);
+  transition: width 0.3s;
 }
 
 .results {
@@ -214,6 +186,9 @@
   color: var(--bad);
   font-weight: 600;
 }
+.mutText {
+  color: var(--mut);
+}
 
 .note {
   margin: 0;
@@ -226,13 +201,10 @@
   padding: 6px 16px 16px;
   color: var(--fg-2);
   max-width: 70ch;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-
-.spin {
-  animation: spin 0.9s linear infinite;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.about a {
+  color: var(--acc);
 }

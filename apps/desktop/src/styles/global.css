@@ -1,12 +1,14 @@
 @import "@fontsource-variable/manrope";
 @import "@fontsource-variable/jetbrains-mono";
 
-/* «Студия»: graphite panels, one amber accent, mono for numbers. */
+/* «Студия»: graphite panels, one amber accent, mono for numbers. Dark is the default;
+   data-theme="light" on <html> switches the tokens. */
 :root {
   --bg: #16171b;
   --panel: #1d1f24;
   --raise: #25282e;
   --raise-2: #2c2f36;
+  --hover: rgba(255, 255, 255, 0.025);
   --line: #2e3138;
   --line-strong: #3a3e46;
   --fg: #eceef1;
@@ -14,13 +16,18 @@
   --mut: #8b909a;
   --dim: #5f646d;
   --acc: #f2a93b;
+  --acc-hover: #f6b858;
   --acc-ink: #1b1408;
   --acc-soft: rgba(242, 169, 59, 0.1);
   --ok: #4fc28a;
   --ok-soft: rgba(79, 194, 138, 0.14);
   --bad: #f06a6a;
   --bad-soft: rgba(240, 106, 106, 0.12);
+  --bad-text: #ffd6d6;
   --warn: #e8c06a;
+  --scrim: rgba(8, 9, 12, 0.6);
+  --shadow: 0 18px 50px -18px rgba(0, 0, 0, 0.75);
+  --glass: rgba(22, 23, 27, 0.72);
 
   --font: "Manrope Variable", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono Variable", Consolas, monospace;
@@ -30,9 +37,37 @@
   --r-lg: 12px;
   --titlebar: 48px;
   --sidebar: 208px;
-  --inspector: 340px;
+  --inspector: 344px;
 
   color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f2f3f5;
+  --panel: #ffffff;
+  --raise: #eceef2;
+  --raise-2: #e2e5ea;
+  --hover: rgba(20, 24, 32, 0.035);
+  --line: #dde0e6;
+  --line-strong: #c6cbd3;
+  --fg: #15181d;
+  --fg-2: #3b4049;
+  --mut: #697080;
+  --dim: #a2a8b3;
+  --acc: #d98a12;
+  --acc-hover: #c57c0d;
+  --acc-ink: #1b1408;
+  --acc-soft: rgba(217, 138, 18, 0.12);
+  --ok: #1d9a60;
+  --ok-soft: rgba(29, 154, 96, 0.12);
+  --bad: #d44343;
+  --bad-soft: rgba(212, 67, 67, 0.1);
+  --bad-text: #9b2020;
+  --warn: #a8771a;
+  --scrim: rgba(30, 34, 42, 0.35);
+  --shadow: 0 18px 50px -20px rgba(20, 24, 32, 0.35);
+  --glass: rgba(255, 255, 255, 0.8);
+  color-scheme: light;
 }
 
 * {
@@ -108,6 +143,7 @@ button:disabled {
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   height: 30px;
   padding: 0 12px;
@@ -133,8 +169,8 @@ button:disabled {
   color: var(--acc-ink);
 }
 .btn.primary:hover:not(:disabled) {
-  background: #f6b858;
-  border-color: #f6b858;
+  background: var(--acc-hover);
+  border-color: var(--acc-hover);
 }
 .btn.ghost {
   background: transparent;
@@ -144,6 +180,9 @@ button:disabled {
 .btn.ghost:hover:not(:disabled) {
   color: var(--fg);
   background: var(--raise);
+}
+.btn.danger {
+  color: var(--bad);
 }
 .btn.lg {
   height: 38px;
@@ -161,10 +200,14 @@ button:disabled {
   border: none;
   background: transparent;
   color: var(--mut);
+  flex: none;
 }
 .icon-btn:hover:not(:disabled) {
   background: var(--raise-2);
   color: var(--fg);
+}
+.icon-btn.on {
+  color: var(--acc);
 }
 
 .field {
@@ -181,6 +224,21 @@ button:disabled {
 .field:focus {
   border-color: var(--acc);
 }
+.field::placeholder {
+  color: var(--dim);
+}
+select.field {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--mut) 50%), linear-gradient(135deg, var(--mut) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 15px, calc(100% - 10px) 15px;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 28px;
+}
+select.field option {
+  background: var(--panel);
+  color: var(--fg);
+}
 
 .label {
   font-size: 11px;
@@ -188,6 +246,136 @@ button:disabled {
   color: var(--mut);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+/* Segmented control */
+.seg {
+  /* Never narrower than its labels: a squeezed control made the buttons overlap. */
+  flex: none;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.seg button {
+  flex: 1 0 auto;
+  min-width: 32px;
+  height: 26px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--mut);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.seg button:hover:not(:disabled) {
+  color: var(--fg);
+}
+.seg button[aria-selected="true"] {
+  background: var(--raise-2);
+  color: var(--fg);
+}
+
+/* Native checkbox restyled as a switch. */
+.switch {
+  appearance: none;
+  flex: none;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--raise-2);
+  position: relative;
+  margin: 0;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--mut);
+  transition: left 0.15s, background 0.15s;
+}
+.switch:checked {
+  background: var(--acc);
+}
+.switch:checked::after {
+  left: 19px;
+  background: var(--acc-ink);
+}
+
+/* Modal */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--scrim);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  animation: fade 0.15s ease-out;
+}
+.modal {
+  width: min(720px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px 10px;
+}
+.modal-head h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.modal-head p {
+  margin: 3px 0 0;
+  color: var(--mut);
+}
+.modal-head .icon-btn {
+  margin-left: auto;
+}
+.modal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 4px 18px 16px;
+  min-height: 0;
+}
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--line);
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -29,11 +29,18 @@ export interface SubtitleTrack {
 }
 
 export interface PlaylistEntry {
+  index: number;
   id: string;
   title: string;
   duration: number | null;
   url: string;
+  viewCount: number | null;
+  downloaded: boolean;
+  /** Filled in the background for the size estimate; null until scanned. */
+  formats: Format[] | null;
 }
+
+export type ChannelTab = "videos" | "shorts" | "streams";
 
 export interface MediaInfo {
   kind: "video" | "playlist";
@@ -49,6 +56,7 @@ export interface MediaInfo {
   subtitles: SubtitleTrack[];
   chapters: number;
   entries: PlaylistEntry[];
+  channelTab: ChannelTab | null;
 }
 
 export type Mode = "video" | "audio";
@@ -71,9 +79,14 @@ export interface DownloadOptions {
   embedThumbnail: boolean;
   embedMetadata: boolean;
   embedChapters: boolean;
+  playlistItems: number[] | null;
+  sectionStart: number | null;
+  sectionEnd: number | null;
+  manualFormats: boolean;
+  preset: string | null;
 }
 
-export type JobStatus = "analyzing" | "ready" | "queued" | "downloading" | "processing" | "done" | "error" | "canceled";
+export type JobStatus = "analyzing" | "ready" | "queued" | "downloading" | "processing" | "paused" | "done" | "error" | "canceled";
 
 export interface Progress {
   fraction: number | null;
@@ -101,6 +114,44 @@ export interface Job {
   progress: Progress;
   error: JobError | null;
   outputs: string[];
+  doneIds: string[];
+  finishedAt: number | null;
+  size: number | null;
+}
+
+export interface HistoryItem {
+  id: string;
+  url: string;
+  kind: "video" | "playlist";
+  videoId: string;
+  title: string;
+  channel: string | null;
+  duration: number | null;
+  finishedAt: number;
+  outputs: string[];
+  size: number | null;
+  options: DownloadOptions | null;
+  count: number;
+  thumbId: string | null;
+}
+
+export interface Preset {
+  id: string;
+  name: string;
+  builtin?: boolean;
+  mode: Mode;
+  maxHeight: number | null;
+  videoCodec: VideoCodec | null;
+  container: Container;
+  audioCodec: AudioCodec;
+  audioQuality: number | null;
+  /** "original" or a language code to prefer when available. */
+  audioLanguage: string;
+  subtitles: string[];
+  embedSubtitles: boolean;
+  embedThumbnail: boolean;
+  embedMetadata: boolean;
+  embedChapters: boolean;
 }
 
 export interface Settings {
@@ -108,16 +159,26 @@ export interface Settings {
   maxParallel: number;
   filenameTemplate: string;
   proxy: string;
+  speedLimitKbps: number;
+  cookiesFile: string;
   bypass: { enabled: boolean; strategy: string };
+  theme: "system" | "dark" | "light";
+  language: "system" | "ru" | "en";
+  closeToTray: boolean;
+  notifications: boolean;
+  clipboardWatch: boolean;
+  autoUpdate: boolean;
+  presets: Preset[];
+  defaultPreset: string;
+  onboarded: boolean;
 }
 
 export type BypassStatus =
   | { state: "off" }
   | { state: "starting" }
-  | { state: "active"; strategy: string }
+  | { state: "active"; strategy: string; mode: "service" | "helper" | "tpws" }
   | { state: "external" }
-  | { state: "error"; code: string; detail: string }
-  | { state: "unsupported" };
+  | { state: "error"; code: string; detail: string };
 
 export interface ToolsStatus {
   ytdlpVersion: string | null;
@@ -135,18 +196,36 @@ export interface StrategyInfo {
 export interface Snapshot {
   settings: Settings;
   jobs: Job[];
+  history: HistoryItem[];
   bypass: BypassStatus;
+  bypassService: boolean;
   tools: ToolsStatus;
   strategies: StrategyInfo[];
   platform: string;
   version: string;
+  systemLanguage: string;
 }
 
 export interface CheckItem {
-  id: string;
-  label: string;
+  id: "youtube" | "ytimg" | "googlevideo" | "speed";
   ok: boolean;
   ms: number | null;
   speed: number | null;
-  detail: string | null;
+  bytes: number | null;
+  error: string | null;
+  timeout: boolean;
+}
+
+export interface AutoselectProgress {
+  index: number;
+  total: number;
+  strategy: string;
+  speed: number | null;
+}
+
+export interface LogLine {
+  ts: number;
+  level: "info" | "warn" | "error";
+  source: string;
+  text: string;
 }

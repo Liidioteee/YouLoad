@@ -7,14 +7,18 @@ use serde::{Deserialize, Serialize};
 pub struct BypassSettings {
     /// Start zapret together with the app.
     pub enabled: bool,
-    /// Strategy id from tools/zapret/strategies.json.
+    /// Strategy id (winws on Windows, tpws elsewhere).
     pub strategy: String,
 }
 
 impl Default for BypassSettings {
     fn default() -> Self {
-        Self { enabled: true, strategy: "alt".into() }
+        Self { enabled: true, strategy: default_strategy().into() }
     }
+}
+
+pub fn default_strategy() -> &'static str {
+    if cfg!(windows) { "alt" } else { "tpws-disorder" }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -26,7 +30,24 @@ pub struct Settings {
     pub filename_template: String,
     /// http://, https:// or socks5:// proxy for yt-dlp; empty = none.
     pub proxy: String,
+    /// Total download speed limit, KB/s; 0 = none.
+    pub speed_limit_kbps: u32,
+    /// Netscape cookies.txt for age-restricted and members-only videos.
+    pub cookies_file: String,
     pub bypass: BypassSettings,
+    /// "system" | "dark" | "light"
+    pub theme: String,
+    /// "system" | "ru" | "en"
+    pub language: String,
+    pub close_to_tray: bool,
+    pub notifications: bool,
+    pub clipboard_watch: bool,
+    pub auto_update: bool,
+    /// User presets, stored as the UI defines them.
+    pub presets: Vec<serde_json::Value>,
+    pub default_preset: String,
+    /// First-run wizard finished.
+    pub onboarded: bool,
 }
 
 impl Default for Settings {
@@ -36,7 +57,18 @@ impl Default for Settings {
             max_parallel: 2,
             filename_template: "%(title)s.%(ext)s".into(),
             proxy: String::new(),
+            speed_limit_kbps: 0,
+            cookies_file: String::new(),
             bypass: BypassSettings::default(),
+            theme: "system".into(),
+            language: "system".into(),
+            close_to_tray: false,
+            notifications: true,
+            clipboard_watch: false,
+            auto_update: true,
+            presets: Vec::new(),
+            default_preset: "standard".into(),
+            onboarded: false,
         }
     }
 }
@@ -67,26 +99,41 @@ impl Settings {
     pub fn normalize(&mut self) {
         self.max_parallel = self.max_parallel.clamp(1, 5);
         self.proxy = self.proxy.trim().to_string();
+        self.cookies_file = self.cookies_file.trim().to_string();
         if self.filename_template.trim().is_empty() {
             self.filename_template = Settings::default().filename_template;
         }
-        if !self.bypass.strategy.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') || self.bypass.strategy.is_empty() {
-            self.bypass.strategy = BypassSettings::default().strategy;
+        let s = &self.bypass.strategy;
+        if s.is_empty() || !s.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') {
+            self.bypass.strategy = default_strategy().into();
+        }
+        if !["system", "dark", "light"].contains(&self.theme.as_str()) {
+            self.theme = "system".into();
+        }
+        if !["system", "ru", "en"].contains(&self.language.as_str()) {
+            self.language = "system".into();
         }
     }
 
+    /// Returns an error code the UI translates.
     pub fn validate(&self) -> Result<(), String> {
         if !self.proxy.is_empty() {
-            let ok = ["http://", "https://", "socks5://", "socks5h://", "socks4://"]
-                .iter()
-                .any(|p| self.proxy.starts_with(p));
+            let ok = ["http://", "https://", "socks5://", "socks5h://", "socks4://"].iter().any(|p| self.proxy.starts_with(p));
             if !ok {
-                return Err("Адрес прокси должен начинаться с http://, https:// или socks5://".into());
+                return Err("proxy_invalid".into());
             }
         }
         if self.filename_template.contains("..") {
-            return Err("Шаблон имени не может содержать «..»".into());
+            return Err("template_invalid".into());
+        }
+        if !self.cookies_file.is_empty() && !Path::new(&self.cookies_file).is_file() {
+            return Err("cookies_missing".into());
         }
         Ok(())
+    }
+
+    /// Per-process yt-dlp limit: the total is shared by the parallel downloads.
+    pub fn per_download_limit_kbps(&self) -> Option<u32> {
+        (self.speed_limit_kbps > 0).then(|| (self.speed_limit_kbps / self.max_parallel.max(1)).max(16))
     }
 }
