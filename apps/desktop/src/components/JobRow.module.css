@@ -1,0 +1,185 @@
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr) 112px;
+  gap: 14px;
+  align-items: center;
+  padding: 8px;
+  border-radius: var(--r);
+  outline: none;
+  cursor: default;
+}
+.row:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+.row:focus-visible {
+  box-shadow: inset 0 0 0 1.5px var(--acc);
+}
+.sel,
+.sel:hover {
+  background: var(--raise);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--raise-2);
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.thumbEmpty {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(110deg, var(--raise) 30%, var(--raise-2) 50%, var(--raise) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+.dur {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.title {
+  font-weight: 650;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.meta {
+  color: var(--mut);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.errText {
+  color: var(--bad);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+.chip {
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--raise-2);
+  color: var(--fg-2);
+}
+
+.bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--raise-2);
+  overflow: hidden;
+  margin-top: 5px;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--acc);
+  border-radius: 2px;
+  transition: width 0.25s linear;
+}
+.bar i.barPulse {
+  background: var(--mut);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.bar i.barDim {
+  background: var(--dim);
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  font-size: 12px;
+  color: var(--mut);
+  text-align: right;
+}
+.status b {
+  font-size: 13px;
+  color: var(--fg);
+  font-weight: 700;
+}
+.status b.ok {
+  color: var(--ok);
+}
+.status b.bad {
+  color: var(--bad);
+}
+.muted {
+  color: var(--mut);
+}
+.spin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.spin svg {
+  animation: spin 0.9s linear infinite;
+}
+
+/* Hover actions cover the status column. */
+.actions {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--raise-2);
+  box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.7);
+}
+.row:hover .actions,
+.row:focus-within .actions {
+  display: flex;
+}
+.actions :global(.btn) {
+  height: 26px;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

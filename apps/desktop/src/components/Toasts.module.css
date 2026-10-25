@@ -1,0 +1,39 @@
+.stack {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 520px;
+  padding: 8px 8px 8px 14px;
+  border-radius: var(--r);
+  background: var(--raise-2);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+  animation: rise 0.18s ease-out;
+}
+
+.error {
+  border-color: rgba(240, 106, 106, 0.45);
+}
+.error span {
+  color: #ffd0d0;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}

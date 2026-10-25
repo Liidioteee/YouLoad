@@ -1,0 +1,10 @@
+node_modules/
+dist/
+target/
+.vite/
+*.log
+.DS_Store
+Thumbs.db
+# downloaded third-party binaries (see scripts/fetch-tools.mjs)
+apps/desktop/src-tauri/resources/tools/
+.cache/
