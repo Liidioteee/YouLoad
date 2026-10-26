@@ -1,0 +1,14 @@
+{
+  "name": "@youload/shared",
+  "private": true,
+  "version": "1.0.2",
+  "type": "module",
+  "description": "Types, format picking, presets and texts shared by the YouLoad app and browser extension",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "peerDependencies": {
+    "react": "^19",
+    "zustand": "^5"
+  }
+}

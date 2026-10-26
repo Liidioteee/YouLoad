@@ -8,7 +8,7 @@ import { Sidebar } from "./components/Sidebar";
 import { TitleBar } from "./components/TitleBar";
 import { Toasts } from "./components/Toasts";
 import { UpdateBanner } from "./components/UpdateBanner";
-import { useT } from "./lib/i18n";
+import { useT } from "@youload/shared/i18n";
 import { applyAppearance, useStore } from "./store";
 import { BypassView } from "./views/BypassView";
 import { DownloadsView } from "./views/DownloadsView";

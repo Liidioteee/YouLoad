@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
 import { api, subscribe } from "./lib/api";
-import { resolve } from "./lib/formats";
-import { currentT, errorText, resolveLang, setLang } from "./lib/i18n";
-import { applyPreset, findPreset } from "./lib/presets";
-import type { AutoselectProgress, BypassStatus, DownloadOptions, HistoryItem, Job, Settings, StrategyInfo, ToolsStatus } from "./lib/types";
+import { resolve } from "@youload/shared/formats";
+import { currentT, errorText, resolveLang, setLang } from "@youload/shared/i18n";
+import { applyPreset, findPreset } from "@youload/shared/presets";
+import type { AutoselectProgress, BypassStatus, DownloadOptions, HistoryItem, Job, Settings, StrategyInfo, ToolsStatus } from "@youload/shared/types";
 
 export type View = "downloads" | "history" | "bypass" | "settings";
 
@@ -52,7 +52,9 @@ let toastSeq = 0;
 
 /** Language and theme follow the settings; "system" theme follows the OS live. */
 export function applyAppearance(settings: Settings, systemLanguage: string) {
-  setLang(resolveLang(settings.language, systemLanguage));
+  const lang = resolveLang(settings.language, systemLanguage);
+  setLang(lang);
+  document.documentElement.lang = lang;
   const dark = settings.theme === "dark" || (settings.theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.dataset.theme = dark ? "dark" : "light";
 }
@@ -106,6 +108,8 @@ export const useStore = create<State>((set, get) => ({
         applyAppearance(settings, get().systemLanguage);
         set({ settings });
       },
+      // "Open in YouLoad" from the browser extension.
+      selectJob: (id) => set({ selected: [id], view: "downloads" }),
       clipboardLink: (url) => {
         const t = currentT();
         get().toast(`${t("clipboard.found")}: ${url}`, "info", { label: t("common.add"), run: () => get().addUrls(url) });

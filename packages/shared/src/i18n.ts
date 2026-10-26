@@ -26,8 +26,8 @@ export function resolveLang(setting: string, system: string): Lang {
 }
 
 export function setLang(lang: Lang) {
+  // The page language is the host's business (the extension runs inside YouTube's page).
   useLang.setState({ lang });
-  document.documentElement.lang = lang;
 }
 
 function lookup(lang: Lang, path: string): Leaf | undefined {
@@ -57,7 +57,7 @@ export function translate(lang: Lang, key: string, vars?: Vars): string {
   if (v == null) return key;
   if (Array.isArray(v)) {
     const n = Number(vars?.n ?? 0);
-    return fill(v[pluralIndex[lang](n)] ?? v[v.length - 1], vars);
+    return fill(v[pluralIndex[lang](n)] ?? v[v.length - 1] ?? "", vars);
   }
   return fill(v, vars);
 }
@@ -84,7 +84,7 @@ export function tNow(key: Key, vars?: Vars): string {
 
 export function jobError(lang: Lang, code: string): { title: string; hint: string } {
   const v = lookup(lang, `jobErrors.${code}`) ?? lookup(lang, "jobErrors.unknown");
-  const [title, hint] = Array.isArray(v) ? v : ["", ""];
+  const [title = "", hint = ""] = Array.isArray(v) ? v : [];
   return { title, hint };
 }
 

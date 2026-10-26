@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 
 import { api } from "../lib/api";
-import { useT } from "../lib/i18n";
-import type { LogLine } from "../lib/types";
+import { useT } from "@youload/shared/i18n";
+import type { LogLine } from "@youload/shared/types";
 import { useStore } from "../store";
 import styles from "./LogModal.module.css";
 

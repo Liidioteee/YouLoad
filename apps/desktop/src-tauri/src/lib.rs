@@ -1,8 +1,11 @@
+mod bridge;
 mod bypass;
 mod clipboard;
 mod download;
+mod estimate;
 mod log;
 mod model;
+mod native_host;
 mod notify;
 mod probe;
 mod procgroup;
@@ -325,13 +328,15 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // Special modes of the same exe: the elevated bypass helper and the bypass service.
+    // Special modes of the same exe: the browser extension's host, the elevated bypass
+    // helper and the bypass service.
+    let args: Vec<String> = std::env::args().collect();
+    if native_host::is_host_invocation(&args) {
+        std::process::exit(native_host::run_relay());
+    }
     #[cfg(windows)]
-    {
-        let args: Vec<String> = std::env::args().collect();
-        if let Some(code) = bypass::windows::dispatch(&args) {
-            std::process::exit(code);
-        }
+    if let Some(code) = bypass::windows::dispatch(&args) {
+        std::process::exit(code);
     }
 
     let app = tauri::Builder::default()
@@ -384,6 +389,10 @@ pub fn run() {
                 tauri::async_runtime::spawn(async move { b.start(bypass_cfg.strategy).await });
             }
             clipboard::start(handle.clone());
+            bridge::start(handle.clone());
+            if let Err(e) = native_host::register(&local_data) {
+                log::warn("extension", format!("browser registration failed: {e}"));
+            }
             if let Err(e) = build_tray(&handle) {
                 log::warn("tray", e.to_string());
             }

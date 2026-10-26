@@ -72,7 +72,7 @@ export function languageName(code: string | null, t: T): string {
       displayNames.set(t.lang, null);
     }
   }
-  const base = code.split(/[-_]/)[0];
+  const base = code.split(/[-_]/)[0] ?? code;
   const name = displayNames.get(t.lang)?.of(base) ?? code;
   return name.charAt(0).toUpperCase() + name.slice(1);
 }

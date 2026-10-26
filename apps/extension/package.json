@@ -1,0 +1,31 @@
+{
+  "name": "@youload/extension",
+  "private": true,
+  "version": "1.0.2",
+  "type": "module",
+  "description": "YouLoad browser extension: download buttons on YouTube that hand off to the YouLoad app",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "typecheck": "tsc --noEmit",
+    "wxt:prepare": "wxt prepare"
+  },
+  "dependencies": {
+    "@youload/shared": "*",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zustand": "^5.0.16",
+    "lucide-react": "^1.61.0"
+  },
+  "devDependencies": {
+    "wxt": "0.21.4",
+    "@wxt-dev/module-react": "1.2.2",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "typescript": "~6.0.3"
+  }
+}

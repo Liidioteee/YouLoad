@@ -4,7 +4,7 @@ import { check, type Update } from "@tauri-apps/plugin-updater";
 import { Download, Loader2, X } from "lucide-react";
 import { create } from "zustand";
 
-import { useT } from "../lib/i18n";
+import { useT } from "@youload/shared/i18n";
 import { useStore } from "../store";
 import styles from "./UpdateBanner.module.css";
 

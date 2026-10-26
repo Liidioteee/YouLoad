@@ -6,8 +6,8 @@ import { Loader2 } from "lucide-react";
 import { LogModal } from "../components/LogModal";
 import { checkForUpdate } from "../components/UpdateBanner";
 import { api } from "../lib/api";
-import { errorText, useT, type Key } from "../lib/i18n";
-import { allPresets, presetTitle } from "../lib/presets";
+import { errorText, useT, type Key } from "@youload/shared/i18n";
+import { allPresets, presetTitle } from "@youload/shared/presets";
 import { useStore } from "../store";
 import styles from "./Page.module.css";
 

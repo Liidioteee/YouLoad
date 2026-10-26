@@ -1,0 +1,316 @@
+/* YouLoad menu and buttons. Lives in shadow roots on YouTube and in the popup, so it carries
+   its own tokens. Light by default; .yl-dark (set from YouTube's own theme) switches. */
+.yl-root {
+  --yl-bg: #ffffff;
+  --yl-raise: #f1f2f4;
+  --yl-line: #dde0e6;
+  --yl-fg: #15181d;
+  --yl-mut: #697080;
+  --yl-acc: #d98a12;
+  --yl-acc-ink: #1b1408;
+  --yl-acc-soft: rgba(217, 138, 18, 0.12);
+  --yl-ok: #1d9a60;
+  --yl-btn: rgba(0, 0, 0, 0.05);
+  --yl-btn-hover: rgba(0, 0, 0, 0.1);
+  --yl-shadow: 0 16px 40px -12px rgba(20, 24, 32, 0.35);
+  font-family: Roboto, "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--yl-fg);
+}
+.yl-root.yl-dark {
+  --yl-bg: #212227;
+  --yl-raise: #2c2e34;
+  --yl-line: #3a3d45;
+  --yl-fg: #eceef1;
+  --yl-mut: #9aa0aa;
+  --yl-acc: #f2a93b;
+  --yl-acc-soft: rgba(242, 169, 59, 0.14);
+  --yl-ok: #4fc28a;
+  --yl-btn: rgba(255, 255, 255, 0.1);
+  --yl-btn-hover: rgba(255, 255, 255, 0.2);
+  --yl-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.75);
+}
+.yl-root *,
+.yl-root *::before,
+.yl-root *::after {
+  box-sizing: border-box;
+}
+.yl-root button,
+.yl-root select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Button under the video, styled like YouTube's own pills. */
+.yl-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px 0 10px;
+  margin-left: 8px;
+  border: none;
+  border-radius: 18px;
+  background: var(--yl-btn);
+  color: var(--yl-fg);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.yl-trigger:hover {
+  background: var(--yl-btn-hover);
+}
+.yl-trigger svg {
+  color: var(--yl-acc);
+}
+.yl-trigger.yl-compact {
+  width: 40px;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+  border-radius: 50%;
+}
+.yl-trigger.yl-round {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  margin: 0 0 16px;
+  justify-content: center;
+  border-radius: 50%;
+}
+.yl-trigger.yl-float {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2200;
+  height: 40px;
+  border-radius: 20px;
+  box-shadow: var(--yl-shadow);
+  background: var(--yl-acc);
+  color: var(--yl-acc-ink);
+}
+.yl-trigger.yl-float svg {
+  color: var(--yl-acc-ink);
+}
+
+/* Popover holding the menu */
+.yl-pop {
+  position: fixed;
+  z-index: 2300;
+  width: 320px;
+  border-radius: 12px;
+  border: 1px solid var(--yl-line);
+  background: var(--yl-bg);
+  box-shadow: var(--yl-shadow);
+  animation: yl-in 0.12s ease-out;
+}
+@keyframes yl-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.yl-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+}
+.yl-center {
+  align-items: center;
+  text-align: center;
+  padding: 26px 14px;
+}
+.yl-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.yl-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.yl-hint {
+  margin: 0;
+  color: var(--yl-mut);
+  font-size: 12px;
+}
+
+.yl-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.yl-presets button,
+.yl-seg button,
+.yl-clip-buttons button {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  border: 1px solid var(--yl-line);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12.5px;
+}
+.yl-presets button:hover,
+.yl-seg button:hover,
+.yl-clip-buttons button:hover {
+  background: var(--yl-raise);
+}
+.yl-presets button.on,
+.yl-seg button.on {
+  border-color: var(--yl-acc);
+  background: var(--yl-acc-soft);
+  color: var(--yl-acc);
+  font-weight: 600;
+}
+
+.yl-row {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  align-items: center;
+  gap: 8px;
+  color: var(--yl-mut);
+  font-size: 12px;
+}
+.yl-row select {
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--yl-line);
+  background: var(--yl-bg);
+  color: var(--yl-fg);
+  font-size: 13px;
+  min-width: 0;
+}
+
+.yl-seg {
+  display: flex;
+  gap: 5px;
+}
+.yl-seg button {
+  flex: 1;
+}
+
+.yl-clip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.yl-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+}
+.yl-check input {
+  margin: 0;
+  accent-color: var(--yl-acc);
+}
+.yl-check svg {
+  color: var(--yl-mut);
+}
+.yl-mono {
+  margin-left: auto;
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 12px;
+  color: var(--yl-fg);
+}
+.yl-clip-buttons {
+  display: flex;
+  gap: 5px;
+}
+.yl-clip-buttons button {
+  flex: 1;
+}
+
+.yl-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 2px;
+}
+.yl-size {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+.yl-size em {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--yl-mut);
+  font-size: 11.5px;
+}
+
+.yl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 17px;
+  border: none;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.yl-primary {
+  background: var(--yl-acc);
+  color: var(--yl-acc-ink);
+}
+.yl-primary:disabled {
+  opacity: 0.6;
+}
+.yl-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--yl-mut);
+  font-size: 12px;
+  cursor: pointer;
+}
+.yl-link:hover {
+  color: var(--yl-fg);
+}
+
+.yl-ok {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--yl-ok);
+  color: #fff;
+}
+.yl-spin {
+  animation: yl-spin 0.9s linear infinite;
+}
+@keyframes yl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yl-pop,
+  .yl-spin {
+    animation: none;
+  }
+}
+.yl-detail {
+  font-family: Consolas, monospace;
+  font-size: 11px;
+  word-break: break-word;
+}

@@ -1,7 +1,7 @@
 import { CheckCheck, Download, FolderOpen, Settings2, ShieldCheck } from "lucide-react";
 
 import { api } from "../lib/api";
-import { errorText, useT, type Key } from "../lib/i18n";
+import { errorText, useT, type Key } from "@youload/shared/i18n";
 import { useStore, type View } from "../store";
 import styles from "./Sidebar.module.css";
 

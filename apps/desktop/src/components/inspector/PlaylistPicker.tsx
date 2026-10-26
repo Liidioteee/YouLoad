@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
-import { clock } from "../../lib/format";
-import { useT } from "../../lib/i18n";
-import type { DownloadOptions, MediaInfo } from "../../lib/types";
+import { clock } from "@youload/shared/format";
+import { useT } from "@youload/shared/i18n";
+import type { DownloadOptions, MediaInfo } from "@youload/shared/types";
 import styles from "../Inspector.module.css";
 
 /** Checkbox list of playlist/channel videos. `playlistItems: null` means all. */

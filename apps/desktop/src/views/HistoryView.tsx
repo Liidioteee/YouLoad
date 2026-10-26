@@ -2,10 +2,10 @@ import { useMemo, useState } from "react";
 import { CheckCheck, FolderOpen, LayoutGrid, List, Play, RotateCcw, Search, Trash2 } from "lucide-react";
 
 import { api } from "../lib/api";
-import { bytes, clock, date } from "../lib/format";
-import { describe, thumbUrl } from "../lib/formats";
-import { errorText, useT } from "../lib/i18n";
-import type { HistoryItem } from "../lib/types";
+import { bytes, clock, date } from "@youload/shared/format";
+import { describe, thumbUrl } from "@youload/shared/formats";
+import { errorText, useT } from "@youload/shared/i18n";
+import type { HistoryItem } from "@youload/shared/types";
 import { useStore } from "../store";
 import styles from "./HistoryView.module.css";
 

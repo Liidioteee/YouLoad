@@ -3,10 +3,10 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { ArrowDown, CheckCircle2, Loader2, XCircle } from "lucide-react";
 
 import { api } from "../lib/api";
-import { speed } from "../lib/format";
-import { errorText, useT } from "../lib/i18n";
-import { allPresets, presetSubtitle, presetTitle } from "../lib/presets";
-import type { CheckItem } from "../lib/types";
+import { speed } from "@youload/shared/format";
+import { errorText, useT } from "@youload/shared/i18n";
+import { allPresets, presetSubtitle, presetTitle } from "@youload/shared/presets";
+import type { CheckItem } from "@youload/shared/types";
 import { useStore } from "../store";
 import styles from "./Onboarding.module.css";
 

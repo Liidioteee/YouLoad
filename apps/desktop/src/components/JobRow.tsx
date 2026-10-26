@@ -2,10 +2,10 @@ import { useState } from "react";
 import { FolderOpen, Loader2, Pause, Play, RotateCcw, Trash2, X } from "lucide-react";
 
 import { api } from "../lib/api";
-import { bytes, clock, percent, speed } from "../lib/format";
-import { describe, thumbnailOf } from "../lib/formats";
-import { errorText, jobError, useT, type Key } from "../lib/i18n";
-import type { Job } from "../lib/types";
+import { bytes, clock, percent, speed } from "@youload/shared/format";
+import { describe, thumbnailOf } from "@youload/shared/formats";
+import { errorText, jobError, useT, type Key } from "@youload/shared/i18n";
+import type { Job } from "@youload/shared/types";
 import { useStore } from "../store";
 import styles from "./JobRow.module.css";
 

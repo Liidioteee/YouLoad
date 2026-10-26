@@ -1,11 +1,11 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "YouLoad",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "identifier": "app.youload.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
+    "devUrl": "http://localhost:5420",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },

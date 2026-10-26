@@ -12,7 +12,7 @@ import type {
   Settings,
   Snapshot,
   ToolsStatus,
-} from "./types";
+} from "@youload/shared/types";
 
 export const api = {
   snapshot: () => invoke<Snapshot>("get_snapshot"),
@@ -49,6 +49,7 @@ export interface Handlers {
   tools: (status: ToolsStatus) => void;
   settings: (settings: Settings) => void;
   clipboardLink: (url: string) => void;
+  selectJob: (id: string) => void;
 }
 
 export async function subscribe(h: Handlers): Promise<UnlistenFn> {
@@ -61,6 +62,7 @@ export async function subscribe(h: Handlers): Promise<UnlistenFn> {
     listen<ToolsStatus>("tools", (e) => h.tools(e.payload)),
     listen<Settings>("settings", (e) => h.settings(e.payload)),
     listen<string>("clipboard-link", (e) => h.clipboardLink(e.payload)),
+    listen<string>("select-job", (e) => h.selectJob(e.payload)),
   ]);
   return () => offs.forEach((off) => off());
 }

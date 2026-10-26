@@ -25,3 +25,22 @@ jobs:
       - run: node scripts/fetch-tools.mjs
       - run: npm run typecheck
       - run: cargo test --lib --manifest-path apps/desktop/src-tauri/Cargo.toml
+
+  extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx wxt prepare
+        working-directory: apps/extension
+      - run: npm run typecheck -w @youload/extension
+      - run: npm run zip -w @youload/extension
+      - run: npm run zip:firefox -w @youload/extension
+      - uses: actions/upload-artifact@v4
+        with:
+          name: youload-extension
+          path: apps/extension/.output/*.zip

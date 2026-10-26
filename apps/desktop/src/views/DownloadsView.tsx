@@ -4,8 +4,8 @@ import { BulkPanel } from "../components/BulkPanel";
 import { Inspector } from "../components/Inspector";
 import { JobRow } from "../components/JobRow";
 import { api } from "../lib/api";
-import { speed as fmtSpeed } from "../lib/format";
-import { useT } from "../lib/i18n";
+import { speed as fmtSpeed } from "@youload/shared/format";
+import { useT } from "@youload/shared/i18n";
 import { useStore } from "../store";
 import styles from "./DownloadsView.module.css";
 

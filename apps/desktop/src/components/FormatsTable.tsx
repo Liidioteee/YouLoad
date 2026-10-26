@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-import { bytes } from "../lib/format";
-import { codecOf, CODEC_LABEL, isAudio, isVideo, languageName } from "../lib/formats";
-import { useT } from "../lib/i18n";
-import type { DownloadOptions, Format, MediaInfo } from "../lib/types";
+import { bytes } from "@youload/shared/format";
+import { codecOf, CODEC_LABEL, isAudio, isVideo, languageName } from "@youload/shared/formats";
+import { useT } from "@youload/shared/i18n";
+import type { DownloadOptions, Format, MediaInfo } from "@youload/shared/types";
 import styles from "./FormatsTable.module.css";
 
 /** Manual pick of the exact video stream and audio track. */

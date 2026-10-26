@@ -1,0 +1,6 @@
+{
+  "$comment": "Public key only: pins the Chrome extension ID for unpacked installs. Not a secret.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvzuC7hQvQF3FFinM1y8JDc8fvAEhyabunDPwU5tBlDdY3vAJwbqvQ4CGbK/EooR2bhgvlfX7Jjgm9arZd5x3sdg/gVFUp5nXM4FZDHVkHQ+N8tY1e3TlE9rVy+dN41NuR7Xv7iAyeWrxcGPL2U5e3CKsNZUNrmBBVNmslfGh76of2XHnc3SYiAa6/YVLvPzsTytK1QH7cu7V7ZccYRrQyJyNLrbjhoRUx6WMjnhS5VxLnxlCJ6BfqWhiuf9XunWVOUzB9Q8sJkUctagtUk0pwXP1Hoq75B4i1xpGyx/B6aTM0GFcERNAiXfhIs3vNNaqURYiIwHTYEf6hZymimS+9QIDAQAB",
+  "chromeId": "gjgjkhcdjdnnhhmggkmfpcklnenencke",
+  "firefoxId": "youload@liidioteee"
+}

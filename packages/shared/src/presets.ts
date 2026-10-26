@@ -30,7 +30,7 @@ export function allPresets(settings: Settings | null): Preset[] {
 
 export function findPreset(settings: Settings | null, id: string | null | undefined): Preset {
   const list = allPresets(settings);
-  return list.find((p) => p.id === id) ?? list.find((p) => p.id === settings?.defaultPreset) ?? BUILTIN_PRESETS[0];
+  return list.find((p) => p.id === id) ?? list.find((p) => p.id === settings?.defaultPreset) ?? BUILTIN_PRESETS[0]!;
 }
 
 export function presetTitle(p: Preset, t: T): string {
@@ -95,7 +95,7 @@ export function presetFromOptions(o: DownloadOptions, name: string): Preset {
     container: o.container,
     audioCodec: o.audioCodec,
     audioQuality: o.audioQuality,
-    audioLanguage: o.audioLanguage ? o.audioLanguage.split("-")[0] : "original",
+    audioLanguage: o.audioLanguage ? (o.audioLanguage.split("-")[0] ?? "original") : "original",
     subtitles: o.subtitles,
     embedSubtitles: o.embedSubtitles,
     embedThumbnail: o.embedThumbnail,

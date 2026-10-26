@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 
-import { useT } from "../lib/i18n";
+import { useT } from "@youload/shared/i18n";
 import { useStore } from "../store";
 import styles from "./Toasts.module.css";
 

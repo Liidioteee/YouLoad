@@ -2,10 +2,10 @@ import { useState } from "react";
 import { X } from "lucide-react";
 
 import { api } from "../lib/api";
-import { bytes } from "../lib/format";
-import { estimatePlaylist, estimateSize } from "../lib/formats";
-import { useT } from "../lib/i18n";
-import { allPresets, presetSubtitle, presetTitle } from "../lib/presets";
+import { bytes } from "@youload/shared/format";
+import { estimatePlaylist, estimateSize } from "@youload/shared/formats";
+import { useT } from "@youload/shared/i18n";
+import { allPresets, presetSubtitle, presetTitle } from "@youload/shared/presets";
 import { useStore } from "../store";
 import styles from "./Inspector.module.css";
 import { Group } from "./inspector/Controls";

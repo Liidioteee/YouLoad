@@ -1,0 +1,101 @@
+html,
+body {
+  margin: 0;
+  width: 340px;
+}
+body {
+  background: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #212227;
+  }
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  background: var(--yl-bg);
+  min-height: 120px;
+}
+
+.popup-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 4px;
+}
+.popup-head b {
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+.popup-head .mark {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: var(--yl-acc);
+  color: var(--yl-acc-ink);
+}
+.popup-head .ver {
+  color: var(--yl-mut);
+  font-size: 11.5px;
+}
+.popup-head .open {
+  margin-left: auto;
+  align-self: center;
+}
+
+.empty {
+  padding: 18px 14px;
+}
+
+.jobs {
+  border-top: 1px solid var(--yl-line);
+  padding: 10px 14px 14px;
+}
+.jobs h3 {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--yl-mut);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.jobs ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.jobs li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 8px;
+}
+.job-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12.5px;
+}
+.job-state {
+  color: var(--yl-mut);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+.bar {
+  grid-column: 1 / -1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--yl-raise);
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--yl-acc);
+}

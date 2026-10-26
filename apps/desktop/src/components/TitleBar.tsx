@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ArrowDown, Copy, Minus, Square, X } from "lucide-react";
 
-import { useT } from "../lib/i18n";
+import { useT } from "@youload/shared/i18n";
 import { useStore } from "../store";
 import { BypassPill } from "./BypassPill";
 import styles from "./TitleBar.module.css";

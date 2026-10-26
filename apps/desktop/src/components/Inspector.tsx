@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AlertTriangle, Languages, Loader2, Plus, SlidersHorizontal, X } from "lucide-react";
 
 import { api } from "../lib/api";
-import { bytes, clock, views } from "../lib/format";
+import { bytes, clock, views } from "@youload/shared/format";
 import {
   CODEC_LABEL,
   PLAYLIST_HEIGHTS,
@@ -17,10 +17,10 @@ import {
   pickVideo,
   qualities,
   thumbnailOf,
-} from "../lib/formats";
-import { errorText, jobError, useT, type Key } from "../lib/i18n";
-import { allPresets, presetFromOptions, presetSubtitle, presetTitle } from "../lib/presets";
-import type { AudioCodec, ChannelTab, Container, DownloadOptions, Job, MediaInfo, VideoCodec } from "../lib/types";
+} from "@youload/shared/formats";
+import { errorText, jobError, useT, type Key } from "@youload/shared/i18n";
+import { allPresets, presetFromOptions, presetSubtitle, presetTitle } from "@youload/shared/presets";
+import type { AudioCodec, ChannelTab, Container, DownloadOptions, Job, MediaInfo, VideoCodec } from "@youload/shared/types";
 import { useStore } from "../store";
 import { FormatsTable } from "./FormatsTable";
 import styles from "./Inspector.module.css";

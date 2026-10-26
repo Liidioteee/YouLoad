@@ -2,9 +2,9 @@ import { useState } from "react";
 import { CheckCircle2, Loader2, ShieldAlert, ShieldCheck, ShieldOff, Wand2, XCircle } from "lucide-react";
 
 import { api } from "../lib/api";
-import { bytes, speed } from "../lib/format";
-import { errorText, translateDynamic, useT, type Key } from "../lib/i18n";
-import type { CheckItem } from "../lib/types";
+import { bytes, speed } from "@youload/shared/format";
+import { errorText, translateDynamic, useT, type Key } from "@youload/shared/i18n";
+import type { CheckItem } from "@youload/shared/types";
 import { useStore } from "../store";
 import styles from "./Page.module.css";
 

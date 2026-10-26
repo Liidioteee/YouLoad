@@ -6014,7 +6014,7 @@ dependencies = [
 
 [[package]]
 name = "youload"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "anyhow",
  "reqwest",
@@ -6037,6 +6037,7 @@ dependencies = [
  "uuid",
  "windows-service",
  "windows-sys 0.61.2",
+ "winreg",
 ]
 
 [[package]]

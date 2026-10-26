@@ -8,16 +8,13 @@ use std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use std::process::Stdio;
 
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager};
-use tokio::io::{AsyncBufReadExt, BufReader};
 
 use crate::log;
 use crate::model::{DownloadOptions, HistoryItem, Job, JobError, JobStatus, MediaKind, Progress};
 use crate::procgroup::ProcGroup;
-use crate::tools::command;
 use crate::{download, notify, probe, AppState};
 
 const STOP_NONE: u8 = 0;
@@ -42,6 +39,8 @@ struct Inner {
     running: HashMap<String, Running>,
     history: Vec<HistoryItem>,
     downloaded: HashSet<String>,
+    /// Choices sent with a link from the browser extension: start as soon as it is analyzed.
+    pending: HashMap<String, DownloadOptions>,
 }
 
 pub struct Queue {
@@ -135,6 +134,11 @@ impl Queue {
         self.inner.lock().unwrap().jobs.clone()
     }
 
+    /// YouTube ids of every video YouLoad has finished, for "only new" in playlists.
+    pub fn downloaded_ids(&self) -> HashSet<String> {
+        self.inner.lock().unwrap().downloaded.clone()
+    }
+
     pub fn history(&self) -> Vec<HistoryItem> {
         self.inner.lock().unwrap().history.clone()
     }
@@ -155,9 +159,9 @@ impl Queue {
         Some(job)
     }
 
-    pub fn add(self: &Arc<Self>, url: String) -> Job {
+    fn add_with_id(self: &Arc<Self>, id: String, url: String) -> Job {
         let job = Job {
-            id: uuid::Uuid::new_v4().to_string(),
+            id,
             url,
             created_at: log::now_ms(),
             status: JobStatus::Analyzing,
@@ -175,6 +179,18 @@ impl Queue {
         let _ = self.app.emit("job", &job);
         self.spawn_probe(job.id.clone());
         job
+    }
+
+    /// Adds a link that starts downloading with these choices once it is analyzed.
+    pub fn add_and_start(self: &Arc<Self>, url: String, options: DownloadOptions) -> Job {
+        // Register the choices before analysis can finish.
+        let id = uuid::Uuid::new_v4().to_string();
+        self.inner.lock().unwrap().pending.insert(id.clone(), options);
+        self.add_with_id(id, url)
+    }
+
+    pub fn add(self: &Arc<Self>, url: String) -> Job {
+        self.add_with_id(uuid::Uuid::new_v4().to_string(), url)
     }
 
     /// True if a job for this exact link is already in the list.
@@ -230,6 +246,12 @@ impl Queue {
                     }
                 }
             });
+            let pending = this.inner.lock().unwrap().pending.remove(&id);
+            if let Some(options) = pending {
+                if this.get(&id).is_some_and(|j| j.status == JobStatus::Ready) {
+                    let _ = this.start(&id, options);
+                }
+            }
             let scan = this
                 .get(&id)
                 .filter(|j| j.status == JobStatus::Ready)
@@ -256,26 +278,7 @@ impl Queue {
                     return;
                 }
                 let Ok((tools, args)) = this.app.state::<AppState>().ytdlp() else { return };
-                let mut cmd = command(&tools.ytdlp);
-                cmd.args(&args)
-                    .args(["--skip-download", "--no-warnings", "--ignore-errors", "--no-playlist", "--print"])
-                    .arg(format!("YLSZ|%(id)s|%(formats.:.{{{}}})j", probe::SCAN_FIELDS))
-                    .arg("--")
-                    .args(&chunk)
-                    .stdout(Stdio::piped())
-                    .stderr(Stdio::null());
-                let mut found: HashMap<String, Vec<crate::model::Format>> = HashMap::new();
-                if let Ok(mut child) = cmd.spawn() {
-                    if let Some(out) = child.stdout.take() {
-                        let mut lines = BufReader::new(out).lines();
-                        while let Ok(Some(line)) = lines.next_line().await {
-                            if let Some((vid, formats)) = line.strip_prefix("YLSZ|").and_then(probe::parse_scan_line) {
-                                found.insert(vid, formats);
-                            }
-                        }
-                    }
-                    let _ = child.wait().await;
-                }
+                let mut found = probe::scan_formats(&tools, &args, &chunk).await;
                 if !this.scan_wanted(&id, &media_url) {
                     return;
                 }

@@ -164,6 +164,33 @@ pub fn parse_media(j: &Value, url: &str) -> MediaInfo {
 pub const SCAN_FIELDS: &str =
     "format_id,ext,protocol,vcodec,acodec,width,height,fps,dynamic_range,tbr,abr,filesize,filesize_approx,language,language_preference,format_note";
 
+/// Fetches formats of a few videos in one yt-dlp run (for playlist size estimates).
+/// Videos that fail (private, removed) are simply missing from the result.
+pub async fn scan_formats(tools: &Tools, base_args: &[String], urls: &[String]) -> std::collections::HashMap<String, Vec<Format>> {
+    use tokio::io::{AsyncBufReadExt, BufReader};
+    let mut found = std::collections::HashMap::new();
+    let mut cmd = command(&tools.ytdlp);
+    cmd.args(base_args)
+        .args(["--skip-download", "--no-warnings", "--ignore-errors", "--no-playlist", "--print"])
+        .arg(format!("YLSZ|%(id)s|%(formats.:.{{{SCAN_FIELDS}}})j"))
+        .arg("--")
+        .args(urls)
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null());
+    if let Ok(mut child) = cmd.spawn() {
+        if let Some(out) = child.stdout.take() {
+            let mut lines = BufReader::new(out).lines();
+            while let Ok(Some(line)) = lines.next_line().await {
+                if let Some((vid, formats)) = line.strip_prefix("YLSZ|").and_then(parse_scan_line) {
+                    found.insert(vid, formats);
+                }
+            }
+        }
+        let _ = child.wait().await;
+    }
+    found
+}
+
 /// Parses one line of the size scan: `<video id>|<formats JSON array>`.
 pub fn parse_scan_line(line: &str) -> Option<(String, Vec<Format>)> {
     let (id, json) = line.split_once('|')?;
