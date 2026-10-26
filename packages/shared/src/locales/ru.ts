@@ -384,6 +384,9 @@ export const ru = {
     openApp: "Открыть YouLoad",
     ctxDownload: "Скачать через YouLoad",
     ctxOpen: "Открыть в YouLoad",
+    reloaded: "Расширение обновилось",
+    reloadedHint: "Эта вкладка открыта со старой версией. Обновите страницу, и кнопка снова заработает.",
+    reloadPage: "Обновить страницу",
   },
   units: {
     b: "Б",

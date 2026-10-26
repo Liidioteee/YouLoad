@@ -385,6 +385,9 @@ export const en: typeof ru = {
     openApp: "Open YouLoad",
     ctxDownload: "Download with YouLoad",
     ctxOpen: "Open in YouLoad",
+    reloaded: "The extension was updated",
+    reloadedHint: "This tab still runs the old version. Reload the page to use the button again.",
+    reloadPage: "Reload page",
   },
   units: {
     b: "B",

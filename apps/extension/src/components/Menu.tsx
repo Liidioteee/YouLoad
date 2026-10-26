@@ -18,8 +18,13 @@ export type PlayerTime = () => number | null;
 
 type Phase = { kind: "loading" } | { kind: "ready" } | { kind: "error"; code: string; detail?: string } | { kind: "sent" };
 
-const failure = (e: unknown): Phase =>
-  e instanceof CallError ? { kind: "error", code: e.code, detail: e.detail } : { kind: "error", code: "app_unavailable", detail: String(e) };
+const failure = (e: unknown): Phase => {
+  if (e instanceof CallError) return { kind: "error", code: e.code, detail: e.detail };
+  const text = e instanceof Error ? e.message : String(e);
+  // After the extension is reloaded or updated, scripts already on open tabs lose it.
+  if (/context invalidated/i.test(text) || !browser.runtime?.id) return { kind: "error", code: "ext_reloaded" };
+  return { kind: "error", code: "app_unavailable", detail: text };
+};
 
 export function Menu({ target, playerTime, onDone }: { target: Target; playerTime?: PlayerTime; onDone?: () => void }) {
   const t = useT();
@@ -113,6 +118,18 @@ export function Menu({ target, playerTime, onDone }: { target: Target; playerTim
           <Check size={20} />
         </span>
         <b>{t("ext.added")}</b>
+      </div>
+    );
+  }
+
+  if (phase.kind === "error" && phase.code === "ext_reloaded") {
+    return (
+      <div className="yl-menu">
+        <b className="yl-title">{t("ext.reloaded")}</b>
+        <p className="yl-hint">{t("ext.reloadedHint")}</p>
+        <button className="yl-btn yl-primary" onClick={() => location.reload()}>
+          {t("ext.reloadPage")}
+        </button>
       </div>
     );
   }
